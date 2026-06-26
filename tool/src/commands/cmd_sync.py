@@ -19,6 +19,7 @@ SYNCABLE_FILES: Dict[str, str] = {
     ".github/ISSUE_TEMPLATE/bug_report.yml": "github/templates/bug_report.yml",
     ".github/ISSUE_TEMPLATE/feature_request.yml": "github/templates/feature_request.yml",
     ".github/PULL_REQUEST_TEMPLATE.md": "github/templates/pull_request_template.md",
+    ".pre-commit-config.yaml": "github/templates/pre-commit-config.yaml",
 }
 
 

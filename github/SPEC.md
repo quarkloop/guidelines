@@ -21,6 +21,34 @@ Every repository must have:
 | `.github/PULL_REQUEST_TEMPLATE.md` | PR description template with checklist |
 | `.github/dependabot.yml` | Automated dependency update PRs |
 | `.editorconfig` | Editor consistency (tabs, spaces, line endings) |
+| `.pre-commit-config.yaml` | Pre-commit hooks (commit format + repo checks + standard hygiene) |
+
+### Pre-commit
+
+Every repo must have a `.pre-commit-config.yaml` that:
+
+1. **Enforces commit message format** — runs `check-commits` on every commit
+2. **Checks repo health** — runs `doctor --quiet` on every commit (fails on missing files, broken AGENTS.md/README.md structure)
+3. **Standard hygiene** — trailing whitespace, end-of-file fixer, YAML/JSON validation, large file prevention, merge conflict detection
+
+The canonical config is at `github/templates/pre-commit-config.yaml`. Each repo copies it and sets the `QUARK_GUIDELINES_PATH` environment variable to point to the local guidelines checkout.
+
+**Setup (one-time per repo):**
+```bash
+pip install pre-commit
+cp <guidelines-repo>/github/templates/pre-commit-config.yaml .pre-commit-config.yaml
+export QUARK_GUIDELINES_PATH=/path/to/guidelines
+pre-commit install
+pre-commit install --hook-type commit-msg
+```
+
+**Run manually:**
+```bash
+pre-commit run --all-files                        # all file-level hooks
+pre-commit run --all-files --hook-stage commit-msg # commit message hook
+```
+
+**Note:** Pre-commit checks the current commit being made, NOT all commit history. To check historical commits, use `check-commits` with `--count` or `--range` directly.
 
 ---
 
