@@ -48,6 +48,14 @@ def _build_context(args: argparse.Namespace) -> Dict[str, str]:
     else:
         ecosystems = []
 
+    # Directories for multi-dir repos (agent has web/ for npm, services/harness for cargo)
+    npm_directory = "/"
+    cargo_directory = "/"
+    if args.type == "platform":
+        # Platform repos may have npm in a web/ subdirectory
+        npm_directory = "/web"
+        cargo_directory = "/services/harness"
+
     return {
         "name": args.name,
         "repo_name": args.repo_name or Path(args.target).name,
@@ -55,6 +63,18 @@ def _build_context(args: argparse.Namespace) -> Dict[str, str]:
         "license": license_name,
         "archetype": args.type,
         "ecosystems": ecosystems,
+        "ecosystem_labels": {
+            "npm": "npm dependencies",
+            "gomod": "Go modules",
+            "maven": "Maven dependencies",
+            "cargo": "Cargo (Rust) dependencies",
+        },
+        "ecosystem_directories": {
+            "npm": npm_directory,
+            "gomod": "/",
+            "maven": "/",
+            "cargo": cargo_directory,
+        },
         # AGENTS.md placeholders
         "description": f"[One-sentence statement of what this repo is and what an AI agent's job is here.]",
         "build_command": f"# [build command for {language}]",
