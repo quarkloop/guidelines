@@ -44,7 +44,7 @@ python3 tool/repo.py doctor --repo /path/to/repo
 python3 tool/repo.py sync --repo /path/to/repo
 
 # List all repos in a workspace and their validation status
-python3 tool/repo.py list --workspace /home/z/my-project
+python3 tool/repo.py list --workspace /path/to/workspace
 
 # Validate commit message format (Conventional Commits)
 python3 tool/repo.py check-commits --repo /path/to/repo

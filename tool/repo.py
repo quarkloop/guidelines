@@ -64,7 +64,7 @@ USAGE
 
   Listing all repos in a workspace:
 
-      python3 tool/repo.py list --workspace /home/z/my-project
+      python3 tool/repo.py list --workspace /path/to/workspace
 
   Checking commit messages:
 

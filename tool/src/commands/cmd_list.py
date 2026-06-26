@@ -111,7 +111,7 @@ Example output:
   quark               25/26      400        81         ✗ FAIL
 
 Examples:
-  python3 tool/repo.py list --workspace /home/z/my-project
+  python3 tool/repo.py list --workspace /path/to/workspace
   python3 tool/repo.py list --workspace .
         """,
     )
