@@ -1,0 +1,51 @@
+# {{ name }}
+
+{{ tagline }}
+
+## Overview
+
+{{ overview }}
+
+## Features
+
+{% for feature in features %}- **{{ feature.name }}** — {{ feature.description }}
+{% endfor %}
+
+## Installation
+
+{% if install_commands %}
+```bash
+{{ install_commands }}
+```
+{% endif %}
+
+See [Build & development](./docs/build.mdx) for full prerequisites.
+
+## Quick start
+
+```bash
+{{ quick_start }}
+```
+
+## Documentation
+
+- [Architecture](./docs/architecture.mdx) — design rationale and module layout
+- [API reference](./docs/api.mdx) — every public type and function
+- [Build & development](./docs/build.mdx) — local setup and testing
+- [Changelog](./CHANGELOG.md) — release history
+- [Contributing](./CONTRIBUTING.md) — development setup, PR workflow, code style
+
+## Compatibility
+
+| Component | Language | Version |
+|---|---|---|
+{% for comp in compatibility %}| {{ comp.component }} | {{ comp.language }} | {{ comp.version }} |
+{% endfor %}
+
+## Contributing
+
+Pull requests are welcome. See [CONTRIBUTING.md](./CONTRIBUTING.md) for development setup, commit message conventions, and code style rules. By participating you agree to abide by the [Code of Conduct](./CODE_OF_CONDUCT.md).
+
+## License
+
+This project is licensed under the {{ license }} — see the [LICENSE](./LICENSE) file for details.

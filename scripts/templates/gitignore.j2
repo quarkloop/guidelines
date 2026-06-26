@@ -1,0 +1,150 @@
+{# .gitignore — generated based on archetype and language #}
+{%- if archetype == 'library' -%}
+{%- if language == 'typescript' %}
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+*.tsbuildinfo
+
+# Editor / OS
+.DS_Store
+*.swp
+.vscode/
+.idea/
+
+# Environment
+.env
+.env.local
+{%- elif language == 'go' %}
+# Build output
+bin/
+dist/
+*.out
+*.test
+*.prof
+
+# Go
+vendor/
+
+# Editor / OS
+.DS_Store
+*.swp
+.vscode/
+.idea/
+
+# Environment
+.env
+.env.local
+{%- elif language == 'rust' %}
+# Build output
+target/
+
+# Editor / OS
+.DS_Store
+*.swp
+.vscode/
+.idea/
+
+# Environment
+.env
+.env.local
+{%- else %}
+# Build output
+bin/
+dist/
+target/
+*.out
+*.test
+*.prof
+*.class
+
+# Go
+vendor/
+
+# Rust
+target/
+
+# Editor / OS
+.DS_Store
+*.swp
+.vscode/
+.idea/
+
+# Environment
+.env
+.env.local
+{%- endif %}
+{%- elif archetype == 'platform' %}
+# Build output
+bin/
+dist/
+target/
+*.out
+*.test
+*.prof
+*.class
+
+# Go
+vendor/
+
+# Rust
+target/
+
+# Java
+target/
+
+# Editor / OS
+.DS_Store
+*.swp
+.vscode/
+.idea/
+
+# Environment
+.env
+.env.local
+{%- elif archetype == 'docs' %}
+# Dependencies
+node_modules/
+
+# Next.js build output
+.next/
+out/
+
+# Vercel
+.vercel/
+
+# Content is synced from product repos — do not commit
+content/
+
+# Pagefind index (generated at build time)
+public/pagefind/
+
+# Fuma Docs generated source
+.source/
+
+# OS / editor
+.DS_Store
+*.swp
+.vscode/
+.idea/
+
+# Environment
+.env
+.env.local
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+{%- elif archetype == 'specs' %}
+# Editor / OS
+.DS_Store
+*.swp
+.vscode/
+.idea/
+
+# Environment
+.env
+.env.local
+{%- endif %}

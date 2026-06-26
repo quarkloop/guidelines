@@ -1,0 +1,80 @@
+version: 2
+
+updates:
+{%- if 'npm' in ecosystems %}
+  # npm dependencies
+  - package-ecosystem: npm
+    directory: {{ npm_directory | default('/') }}
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 10
+    groups:
+      minor-and-patch:
+        update-types:
+          - minor
+          - patch
+    labels:
+      - dependencies
+
+{%- endif %}
+{%- if 'gomod' in ecosystems %}
+  # Go modules
+  - package-ecosystem: gomod
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 10
+    groups:
+      minor-and-patch:
+        update-types:
+          - minor
+          - patch
+    labels:
+      - dependencies
+
+{%- endif %}
+{%- if 'maven' in ecosystems %}
+  # Maven dependencies
+  - package-ecosystem: maven
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 10
+    groups:
+      minor-and-patch:
+        update-types:
+          - minor
+          - patch
+    labels:
+      - dependencies
+
+{%- endif %}
+{%- if 'cargo' in ecosystems %}
+  # Cargo (Rust) dependencies
+  - package-ecosystem: cargo
+    directory: {{ cargo_directory | default('/') }}
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 10
+    groups:
+      minor-and-patch:
+        update-types:
+          - minor
+          - patch
+    labels:
+      - dependencies
+
+{%- endif %}
+  # GitHub Actions
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 10
+    labels:
+      - dependencies

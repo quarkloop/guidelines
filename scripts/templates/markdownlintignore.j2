@@ -1,0 +1,27 @@
+{# .markdownlintignore — generated based on archetype #}
+{%- if archetype == 'library' %}
+node_modules/
+dist/
+.next/
+.vercel/
+bun.lock
+{%- elif archetype == 'platform' %}
+node_modules/
+bin/
+vendor/
+target/
+dist/
+.next/
+.vercel/
+e2e/testdata/
+{%- elif archetype == 'docs' %}
+node_modules/
+.next/
+.vercel/
+.source/
+content/
+public/pagefind/
+package-lock.json
+{%- elif archetype == 'specs' %}
+{# specs repo has no generated content to ignore #}
+{%- endif %}

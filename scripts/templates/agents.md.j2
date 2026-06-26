@@ -1,0 +1,87 @@
+# Agent Guide
+
+{{ description }}
+
+## Repository
+
+- **Name**: {{ name }}
+- **Language**: {{ language }}
+- **License**: {{ license }}
+- **Repo**: [github.com/quarkloop/{{ repo_name }}](https://github.com/quarkloop/{{ repo_name }})
+- **Guidelines**: [quarkloop/guidelines](https://github.com/quarkloop/guidelines)
+
+## Quick reference
+
+```bash
+# Build
+{{ build_command }}
+
+# Test
+{{ test_command }}
+
+# Pre-commit gate
+{{ check_command }}
+```
+
+## Structure
+
+```
+{{ repo_name }}/
+{% for dir in directories %}├── {{ dir }}/
+{% endfor %}
+```
+
+## Rules
+
+1. Do not break the public API without an explicit major version bump.
+2. Do not add new top-level dependencies without discussing in an issue first.
+3. Run `{{ check_command }}` before every commit — it must pass with zero errors.
+4. Do not commit generated files (dist/, build artifacts, *.tsbuildinfo).
+5. Do not disable linters or strict mode for individual files.
+6. Every new function needs a unit test.
+7. Every bug fix needs a regression test.
+8. Inspect staged files before every commit.
+9. Do not include `Co-authored-by` trailers.
+10. Do not use destructive git commands unless explicitly requested.
+
+## Boundaries
+
+{%- if boundaries %}
+{% for b in boundaries %}
+- `{{ b.component }}` owns {{ b.responsibility }}.
+{%- endfor %}
+{%- else %}
+<!-- For multi-component repos, list each component and what it owns here. -->
+<!-- For single-module repos, this section can be omitted. -->
+{%- endif %}
+
+## Commit conventions
+
+- Format: `type(scope): short summary`
+- Types: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`, `perf`, `build`
+- One scope per commit — do not mix unrelated changes.
+- Inspect staged files before every commit: `git diff --cached --stat`
+- Never stage: `.env`, `node_modules/`, `dist/`, `*.tsbuildinfo`, editor configs.
+- Do not include `Co-authored-by` trailers.
+- Do not use destructive git commands unless explicitly requested.
+- Examples:
+  - `feat(core): add streaming support for batch calls`
+  - `fix(api): propagate io.ReadAll errors`
+  - `docs(readme): add installation instructions`
+
+## Testing
+
+- Every new function needs a unit test alongside the source file.
+- Every bug fix needs a regression test that would have caught the bug.
+- Run `{{ test_command }}` — must pass with zero failures before committing.
+- For E2E tests: `{{ e2e_command }}` (requires external services if applicable).
+- Tests must not mock external services when a real one is available.
+- Tests must not pre-extract or pre-index data that the agent is supposed to process.
+
+## When you're stuck
+
+- Read `docs/architecture.mdx` for design rationale.
+- Read `docs/api.mdx` for the full API reference.
+- Read the [AGENTS.md spec](https://github.com/quarkloop/guidelines/blob/main/agents/SPEC.md) for org-wide conventions.
+- Search existing issues and PRs before asking.
+- If unsure about a public API change, open an issue and ask before implementing.

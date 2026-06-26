@@ -1,0 +1,36 @@
+# Security Policy
+
+## Supported versions
+
+| Version | Supported          |
+|---------|--------------------|
+| main    | :white_check_mark: |
+| < 0.1   | :x:                |
+
+## Reporting a vulnerability
+
+**Do NOT file a public GitHub issue for security vulnerabilities.**
+
+Instead, email **reza.ebrahimi.dev@gmail.com** with:
+
+1. A description of the vulnerability and its impact.
+2. Steps to reproduce (a minimal reproducer is ideal).
+3. Affected component and version.
+4. Any suggested fixes or mitigations.
+
+You should receive an acknowledgment within 72 hours.
+
+## Scope
+
+In scope:
+{% for component in in_scope_components %}- {{ component }}
+{% endfor %}
+
+Out of scope:
+- Vulnerabilities in third-party dependencies (report upstream)
+- Social engineering attacks
+- Theoretical timing attacks without a demonstrated exploit
+
+## API Keys
+
+{{ project_name }} never stores API keys: they are injected at runtime from environment variables. Never commit your `.env` file; use `.env.example` as a template.

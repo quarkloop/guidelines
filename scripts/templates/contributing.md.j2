@@ -1,0 +1,65 @@
+# Contributing to {{ name }}
+
+Thank you for your interest in contributing. This guide covers everything you need to get started.
+
+## Prerequisites
+
+{% for prereq in prerequisites %}- {{ prereq }}
+{% endfor %}
+
+## Getting started
+
+```bash
+git clone https://github.com/quarkloop/{{ repo_name }}
+cd {{ repo_name }}
+{{ build_command }}
+```
+
+## Running tests
+
+```bash
+{{ test_command }}
+```
+
+## Code style
+
+- Follow the existing code style in the repository
+- Run the formatter before committing: `{{ fmt_command }}`
+- Run the linter: `{{ lint_command }}`
+- Exported types and functions require doc comments
+- Errors are wrapped with context — never discarded silently
+
+## Submitting changes
+
+1. Fork the repository and create a branch from `main`
+2. Make your changes — keep commits focused and atomic
+3. Run `{{ check_command }}`
+4. Open a pull request against `main` with a clear description of what and why
+5. Link any related issues
+
+### Commit message format
+
+```
+type(scope): short summary
+
+Optional longer description explaining why the change was made.
+```
+
+Types: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`
+
+Examples:
+- `feat(core): add cron session type`
+- `fix(api): propagate io.ReadAll errors`
+- `docs(readme): add installation instructions`
+
+## Reporting bugs
+
+Please use GitHub Issues with the bug report template. Include your project version, runtime version, OS, and steps to reproduce.
+
+## Code of Conduct
+
+By participating in this project you agree to abide by the [Code of Conduct](CODE_OF_CONDUCT.md).
+
+## License
+
+By contributing you agree that your contributions will be licensed under the [Apache License 2.0](LICENSE).
