@@ -16,7 +16,7 @@ class Archetype:
     description: str
     directories: List[str]
     # Map of destination path → template name (None means copy from guidelines)
-    # Template names are relative to scripts/templates/
+    # Template names are relative to tool/templates/
     # None means copy the file from the guidelines repo root
     file_templates: Dict[str, Optional[str]] = field(default_factory=dict)
     # Files that are copied verbatim from github/templates/

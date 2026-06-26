@@ -1,27 +1,16 @@
 """
-cli.py — Command-line interface for quarkloop repository tooling.
+cmd_init.py — `repo.py init` subcommand.
 
-Single responsibility: parse arguments and dispatch to the appropriate
-subcommand (init, validate). No business logic — delegates to generator
-and validator modules.
+Single responsibility: scaffold a new repository with the standard
+file layout, GitHub configuration, and documentation skeletons.
 """
 
 import argparse
-import json
-import sys
 from pathlib import Path
 from typing import Dict
 
-from .archetypes import ARCHETYPES, get_archetype
-from .generator import RepoGenerator
-from .validator import validate_repo, print_report
-
-
-def _resolve_guidelines_root() -> Path:
-    """Resolve the guidelines repo root from this file's location."""
-    # This file is at guidelines/scripts/src/cli.py
-    # Guidelines root is 3 levels up
-    return Path(__file__).resolve().parents[2]
+from ..archetypes import ARCHETYPES, get_archetype
+from ..generator import RepoGenerator
 
 
 def _build_context(args: argparse.Namespace) -> Dict[str, str]:
@@ -29,7 +18,7 @@ def _build_context(args: argparse.Namespace) -> Dict[str, str]:
     language = args.language or "unspecified"
     license_name = "Apache 2.0"
 
-    # Determine ecosystems for dependabot based on language
+    # Determine ecosystems for dependabot based on language and archetype
     if args.type == "library":
         if language == "typescript":
             ecosystems = ["npm"]
@@ -48,11 +37,10 @@ def _build_context(args: argparse.Namespace) -> Dict[str, str]:
     else:
         ecosystems = []
 
-    # Directories for multi-dir repos (agent has web/ for npm, services/harness for cargo)
+    # Directories for multi-dir repos
     npm_directory = "/"
     cargo_directory = "/"
     if args.type == "platform":
-        # Platform repos may have npm in a web/ subdirectory
         npm_directory = "/web"
         cargo_directory = "/services/harness"
 
@@ -76,7 +64,7 @@ def _build_context(args: argparse.Namespace) -> Dict[str, str]:
             "cargo": cargo_directory,
         },
         # AGENTS.md placeholders
-        "description": f"[One-sentence statement of what this repo is and what an AI agent's job is here.]",
+        "description": "[One-sentence statement of what this repo is and what an AI agent's job is here.]",
         "build_command": f"# [build command for {language}]",
         "test_command": f"# [test command for {language}]",
         "check_command": f"# [check/lint command for {language}]",
@@ -107,8 +95,15 @@ def _build_context(args: argparse.Namespace) -> Dict[str, str]:
     }
 
 
-def cmd_init(args: argparse.Namespace):
-    """Handle the 'init' subcommand — scaffold a new repo."""
+def _resolve_guidelines_root() -> Path:
+    """Resolve the guidelines repo root from this file's location."""
+    # This file is at guidelines/tool/src/commands/cmd_init.py
+    # Guidelines root is 4 levels up
+    return Path(__file__).resolve().parents[3]
+
+
+def run(args: argparse.Namespace):
+    """Execute the init subcommand."""
     guidelines_root = _resolve_guidelines_root()
     target = Path(args.target).resolve()
 
@@ -172,49 +167,9 @@ def cmd_init(args: argparse.Namespace):
         print("  6. git push -u origin main")
 
 
-def cmd_validate(args: argparse.Namespace):
-    """Handle the 'validate' subcommand — check a repo against specs."""
-    report = validate_repo(args.repo)
-
-    if args.json:
-        output = {
-            "repo": report.repo_path,
-            "passed": report.all_passed,
-            "summary": {
-                "total": len(report.results),
-                "passed": report.passed_count,
-                "failed": report.failed_count,
-            },
-            "checks": [
-                {
-                    "name": r.name,
-                    "passed": r.passed,
-                    "message": r.message,
-                    "detail": r.detail,
-                }
-                for r in report.results
-            ],
-        }
-        print(json.dumps(output, indent=2))
-    else:
-        print(f"Validating: {report.repo_path}")
-        print()
-        print_report(report, quiet=args.quiet)
-
-    sys.exit(0 if report.all_passed else 1)
-
-
-def build_parser() -> argparse.ArgumentParser:
-    """Build the argument parser with subcommands."""
-    parser = argparse.ArgumentParser(
-        prog="repo.py",
-        description="Quarkloop repository tooling — scaffold and validate repos.",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-    )
-    subparsers = parser.add_subparsers(dest="command", required=True)
-
-    # ─── init subcommand ────────────────────────────────────────────
-    init_parser = subparsers.add_parser(
+def add_parser(subparsers) -> None:
+    """Register the init subcommand parser."""
+    parser = subparsers.add_parser(
         "init",
         help="Scaffold a new repository with required files",
         description="Scaffold a new quarkloop repository with required files.",
@@ -227,81 +182,33 @@ Archetypes:
   specs     — specifications repository (like guidelines)
 
 Examples:
-  python3 scripts/repo.py init --type library --name "Quark Lib" --target ./quark-lib --language typescript
-  python3 scripts/repo.py init --type platform --name "Quark Svc" --target ./quark-svc --dry-run
+  python3 tool/repo.py init --type library --name "Quark Lib" --target ./quark-lib --language typescript
+  python3 tool/repo.py init --type platform --name "Quark Svc" --target ./quark-svc --dry-run
         """,
     )
-    init_parser.add_argument(
+    parser.add_argument(
         "--type", required=True, choices=ARCHETYPES.keys(),
         help="Repository archetype",
     )
-    init_parser.add_argument(
+    parser.add_argument(
         "--name", required=True,
         help="Human-readable project name (e.g., 'Quark JS SDK')",
     )
-    init_parser.add_argument(
+    parser.add_argument(
         "--target", required=True,
         help="Target directory (will be created if it doesn't exist)",
     )
-    init_parser.add_argument(
+    parser.add_argument(
         "--repo-name", default=None,
         help="GitHub repo name (e.g., 'quark-js'). Defaults to --target basename.",
     )
-    init_parser.add_argument(
+    parser.add_argument(
         "--language", default=None,
         choices=["typescript", "go", "rust", "java", "mixed"],
         help="Primary language (affects .gitignore and dependabot config)",
     )
-    init_parser.add_argument(
+    parser.add_argument(
         "--dry-run", action="store_true",
         help="Print what would be created without writing files",
     )
-    init_parser.set_defaults(func=cmd_init)
-
-    # ─── validate subcommand ────────────────────────────────────────
-    validate_parser = subparsers.add_parser(
-        "validate",
-        help="Validate a repository against quarkloop guidelines",
-        description="Validate an existing repository against quarkloop guidelines.",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-Checks:
-  - Required files exist (AGENTS.md, README.md, LICENSE, etc.)
-  - AGENTS.md has all required sections and the Guidelines reference
-  - AGENTS.md line count meets target (>=200 small, >=400 large)
-  - README.md has all required sections and is under 200 lines
-  - .editorconfig exists with root=true
-  - .markdownlint.json exists
-  - .github/dependabot.yml exists
-  - GitHub issue templates exist with required fields
-  - PR template exists with required sections
-  - LICENSE is Apache 2.0 or MIT
-
-Examples:
-  python3 scripts/repo.py validate --repo /path/to/repo
-  python3 scripts/repo.py validate --repo /path/to/repo --json
-  python3 scripts/repo.py validate --repo /path/to/repo --quiet
-        """,
-    )
-    validate_parser.add_argument(
-        "--repo", required=True,
-        help="Path to the repository to validate",
-    )
-    validate_parser.add_argument(
-        "--json", action="store_true",
-        help="Output results as JSON (for CI integration)",
-    )
-    validate_parser.add_argument(
-        "--quiet", action="store_true",
-        help="Only show failures (suppress passed checks)",
-    )
-    validate_parser.set_defaults(func=cmd_validate)
-
-    return parser
-
-
-def main():
-    """Parse arguments and dispatch to the appropriate subcommand."""
-    parser = build_parser()
-    args = parser.parse_args()
-    args.func(args)
+    parser.set_defaults(func=run)

@@ -24,7 +24,7 @@ class RepoGenerator:
                              (for locating templates/ and static files).
         """
         self.guidelines_root = guidelines_root
-        self.templates_dir = guidelines_root / "scripts" / "templates"
+        self.templates_dir = guidelines_root / "tool" / "templates"
         self.github_templates_dir = guidelines_root / "github" / "templates"
         self.markdownlint_dir = guidelines_root / "markdownlint"
 

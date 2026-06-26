@@ -29,36 +29,50 @@ Consistency across repositories reduces cognitive load for contributors and give
 
 ## Tooling
 
-### `scripts/init_repo.py` — Scaffold a new repository
+### `tool/repo.py` — Repository management CLI
 
-Creates the directory structure and copies canonical template files into a new (or existing) repository. Supports 4 archetypes: `library`, `platform`, `docs`, `specs`.
-
-```bash
-# Scaffold a TypeScript library
-python3 scripts/init_repo.py --type library --name "Quark New Lib" --target ./quark-new-lib --language typescript
-
-# Dry run (preview without writing)
-python3 scripts/init_repo.py --type platform --name "Quark New Svc" --target ./quark-new-svc --dry-run
-```
-
-Safe to run on existing repos — it skips files that already exist.
-
-### `scripts/validate_repo.py` — Validate a repository against specs
-
-Checks an existing repository for compliance with the quarkloop guidelines: required files, AGENTS.md sections and line count, README.md sections and line count, GitHub config, issue templates, PR template, license.
+A single entry point for all repository tooling. Six subcommands:
 
 ```bash
-# Validate a repo (human-readable output)
-python3 scripts/validate_repo.py --repo /path/to/repo
+# Scaffold a new repository
+python3 tool/repo.py init --type library --name "Quark Lib" --target ./quark-lib --language typescript
 
-# JSON output (for CI integration)
-python3 scripts/validate_repo.py --repo /path/to/repo --json
+# Validate a repo and get actionable fix suggestions
+python3 tool/repo.py doctor --repo /path/to/repo
 
-# Quiet mode (only show failures)
-python3 scripts/validate_repo.py --repo /path/to/repo --quiet
+# Sync canonical template files from guidelines into a repo
+python3 tool/repo.py sync --repo /path/to/repo
+
+# List all repos in a workspace and their validation status
+python3 tool/repo.py list --workspace /home/z/my-project
+
+# Validate commit message format (Conventional Commits)
+python3 tool/repo.py check-commits --repo /path/to/repo
+
+# Generate README badge markdown
+python3 tool/repo.py badges --repo /path/to/repo
 ```
 
-Exit codes: `0` = all checks passed, `1` = one or more checks failed.
+Module structure (strict SRP — one responsibility per file):
+
+```
+tool/
+├── repo.py                       # Single entry point — imports cli.main()
+├── src/
+│   ├── cli.py                    # Argument parsing and subcommand dispatch
+│   ├── generator.py              # Jinja2 template rendering (init)
+│   ├── checks.py                 # Individual check functions (doctor)
+│   ├── archetypes.py             # Archetype definitions (pure data)
+│   ├── models.py                 # Data classes (CheckResult, ValidationReport)
+│   └── commands/                 # One file per subcommand
+│       ├── cmd_init.py           # `init` — scaffold new repo
+│       ├── cmd_doctor.py         # `doctor` — validate + suggest fixes
+│       ├── cmd_sync.py           # `sync` — copy templates from guidelines
+│       ├── cmd_list.py           # `list` — org-wide validation summary
+│       ├── cmd_check_commits.py  # `check-commits` — commit format validation
+│       └── cmd_badges.py         # `badges` — generate README badges
+└── templates/                    # Jinja2 templates (*.j2)
+```
 
 ## How to use
 
@@ -119,9 +133,22 @@ guidelines/
 ├── markdownlint/
 │   ├── SPEC.md                        ← markdown linting specification
 │   └── .markdownlint.json             ← canonical markdownlint config
-└── scripts/
-    ├── init_repo.py                   ← scaffold a new repo from archetype
-    └── validate_repo.py               ← validate a repo against specs
+└── tool/
+    ├── repo.py                       ← single CLI entry point
+    ├── src/
+    │   ├── cli.py                    ← argument parsing and dispatch
+    │   ├── generator.py              ← Jinja2 template rendering (init)
+    │   ├── checks.py                 ← validation check functions (doctor)
+    │   ├── archetypes.py             ← archetype definitions
+    │   ├── models.py                 ← data classes
+    │   └── commands/                 ← one file per subcommand
+    │       ├── cmd_init.py
+    │       ├── cmd_doctor.py
+    │       ├── cmd_sync.py
+    │       ├── cmd_list.py
+    │       ├── cmd_check_commits.py
+    │       └── cmd_badges.py
+    └── templates/                    ← Jinja2 templates (*.j2)
 ```
 
 ## Contributing

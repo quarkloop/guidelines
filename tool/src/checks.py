@@ -78,7 +78,8 @@ AGENTS_LARGE_THRESHOLD = 50
 README_MAX_LINES = 200
 
 SOURCE_EXTENSIONS = {".go", ".ts", ".tsx", ".rs", ".java", ".py", ".js", ".jsx"}
-SKIP_DIRS = {".git", "node_modules", "target", "dist", "bin", "vendor", ".next", ".vercel", ".source"}
+SKIP_DIRS = {".git", "node_modules", "target", "dist", "bin", "vendor",
+             ".next", ".vercel", ".source", "__pycache__"}
 
 
 # ─── Utility functions ─────────────────────────────────────────────────
@@ -122,7 +123,11 @@ def check_required_file(repo: Path, filepath: str) -> CheckResult:
     path = repo / filepath
     if path.exists():
         return CheckResult(f"Required file: {filepath}", True, f"Found: {filepath}")
-    return CheckResult(f"Required file: {filepath}", False, f"Missing: {filepath}")
+    return CheckResult(
+        f"Required file: {filepath}", False, f"Missing: {filepath}",
+        suggestion=f"Run: python3 tool/repo.py init --type <archetype> --target .  "
+                   f"(will create {filepath} if missing)",
+    )
 
 
 def check_optional_file(repo: Path, filepath: str) -> CheckResult:
@@ -130,7 +135,11 @@ def check_optional_file(repo: Path, filepath: str) -> CheckResult:
     path = repo / filepath
     if path.exists():
         return CheckResult(f"Optional file: {filepath}", True, f"Found: {filepath}")
-    return CheckResult(f"Optional file: {filepath}", True, f"Not present (optional): {filepath}")
+    return CheckResult(
+        f"Optional file: {filepath}", True, f"Not present (optional): {filepath}",
+        suggestion=f"Consider adding {filepath} for completeness. "
+                   f"Run: python3 tool/repo.py init --type <archetype> --target .",
+    )
 
 
 # ─── AGENTS.md checks ──────────────────────────────────────────────────
@@ -139,7 +148,10 @@ def check_agents_sections(repo: Path) -> CheckResult:
     """Check AGENTS.md has all required sections."""
     content = _read_file(repo / "AGENTS.md")
     if content is None:
-        return CheckResult("AGENTS.md sections", False, "AGENTS.md not found")
+        return CheckResult(
+            "AGENTS.md sections", False, "AGENTS.md not found",
+            suggestion="Run: python3 tool/repo.py init --type <archetype> --target .",
+        )
 
     missing = [s for s in AGENTS_REQUIRED_SECTIONS if s not in content]
     if missing:
@@ -147,6 +159,8 @@ def check_agents_sections(repo: Path) -> CheckResult:
         return CheckResult(
             "AGENTS.md sections", False,
             f"Missing {len(missing)} required sections", detail,
+            suggestion="See the AGENTS.md spec: "
+                       "github.com/quarkloop/guidelines/blob/main/agents/SPEC.md",
         )
     return CheckResult(
         "AGENTS.md sections", True,
@@ -162,14 +176,21 @@ def check_agents_guidelines_ref(repo: Path) -> CheckResult:
 
     if "quarkloop/guidelines" in content:
         return CheckResult("AGENTS.md guidelines ref", True, "References quarkloop/guidelines")
-    return CheckResult("AGENTS.md guidelines ref", False, "Missing reference to quarkloop/guidelines")
+    return CheckResult(
+        "AGENTS.md guidelines ref", False, "Missing reference to quarkloop/guidelines",
+        suggestion="Add this line to the Repository section:\n"
+                   '  - **Guidelines**: [quarkloop/guidelines](https://github.com/quarkloop/guidelines)',
+    )
 
 
 def check_agents_line_count(repo: Path) -> CheckResult:
     """Check AGENTS.md line count meets the target for the repo size."""
     lines = _count_lines(repo / "AGENTS.md")
     if lines == 0:
-        return CheckResult("AGENTS.md line count", False, "AGENTS.md not found or empty")
+        return CheckResult(
+            "AGENTS.md line count", False, "AGENTS.md not found or empty",
+            suggestion="Run: python3 tool/repo.py init --type <archetype> --target .",
+        )
 
     large = is_large_repo(repo)
     target = AGENTS_LARGE_TARGET if large else AGENTS_SMALL_TARGET
@@ -184,7 +205,11 @@ def check_agents_line_count(repo: Path) -> CheckResult:
     return CheckResult(
         "AGENTS.md line count", False,
         f"{lines} lines (< {target} target for {repo_type} repo)",
-        f"Repo has {source_count} source files → classified as {repo_type} (target: {target} lines)",
+        detail=f"Repo has {source_count} source files → classified as {repo_type} "
+               f"(target: {target} lines)",
+        suggestion=f"Add more rules, boundary descriptions, or common-mistakes "
+                   f"sections to reach {target} lines. See the spec: "
+                   f"github.com/quarkloop/guidelines/blob/main/agents/SPEC.md",
     )
 
 
@@ -194,7 +219,10 @@ def check_readme_sections(repo: Path) -> CheckResult:
     """Check README.md has all required sections."""
     content = _read_file(repo / "README.md")
     if content is None:
-        return CheckResult("README.md sections", False, "README.md not found")
+        return CheckResult(
+            "README.md sections", False, "README.md not found",
+            suggestion="Run: python3 tool/repo.py init --type <archetype> --target .",
+        )
 
     missing = [s for s in README_REQUIRED_SECTIONS if s not in content]
     if missing:
@@ -202,6 +230,8 @@ def check_readme_sections(repo: Path) -> CheckResult:
         return CheckResult(
             "README.md sections", False,
             f"Missing {len(missing)} required sections", detail,
+            suggestion="See the README.md spec: "
+                       "github.com/quarkloop/guidelines/blob/main/readme/SPEC.md",
         )
     return CheckResult(
         "README.md sections", True,
@@ -213,14 +243,20 @@ def check_readme_line_count(repo: Path) -> CheckResult:
     """Check README.md is under 200 lines."""
     lines = _count_lines(repo / "README.md")
     if lines == 0:
-        return CheckResult("README.md line count", False, "README.md not found or empty")
+        return CheckResult(
+            "README.md line count", False, "README.md not found or empty",
+            suggestion="Run: python3 tool/repo.py init --type <archetype> --target .",
+        )
 
     if lines <= README_MAX_LINES:
-        return CheckResult("README.md line count", True, f"{lines} lines (<= {README_MAX_LINES})")
+        return CheckResult(
+            "README.md line count", True, f"{lines} lines (<= {README_MAX_LINES})",
+        )
     return CheckResult(
         "README.md line count", False,
         f"{lines} lines (> {README_MAX_LINES} target)",
-        "Move detailed content to docs/*.mdx files",
+        suggestion=f"Move detailed content to docs/*.mdx files. "
+                   f"Trim {lines - README_MAX_LINES} lines to reach {README_MAX_LINES}.",
     )
 
 
@@ -230,11 +266,17 @@ def check_editorconfig(repo: Path) -> CheckResult:
     """Check .editorconfig exists and has root=true."""
     content = _read_file(repo / ".editorconfig")
     if content is None:
-        return CheckResult(".editorconfig", False, ".editorconfig not found")
-
+        return CheckResult(
+            ".editorconfig", False, ".editorconfig not found",
+            suggestion="Run: python3 tool/repo.py sync --repo .",
+        )
     if "root = true" in content:
         return CheckResult(".editorconfig", True, "Found with root=true")
-    return CheckResult(".editorconfig", False, "Missing 'root = true' directive")
+    return CheckResult(
+        ".editorconfig", False, "Missing 'root = true' directive",
+        suggestion="Add 'root = true' as the first line. "
+                   "Or run: python3 tool/repo.py sync --repo .",
+    )
 
 
 def check_markdownlint_config(repo: Path) -> CheckResult:
@@ -242,7 +284,10 @@ def check_markdownlint_config(repo: Path) -> CheckResult:
     path = repo / ".markdownlint.json"
     if path.exists():
         return CheckResult(".markdownlint.json", True, "Found")
-    return CheckResult(".markdownlint.json", False, "Missing")
+    return CheckResult(
+        ".markdownlint.json", False, "Missing",
+        suggestion="Run: python3 tool/repo.py sync --repo .",
+    )
 
 
 def check_dependabot(repo: Path) -> CheckResult:
@@ -250,14 +295,21 @@ def check_dependabot(repo: Path) -> CheckResult:
     path = repo / ".github" / "dependabot.yml"
     if path.exists():
         return CheckResult(".github/dependabot.yml", True, "Found")
-    return CheckResult(".github/dependabot.yml", False, "Missing")
+    return CheckResult(
+        ".github/dependabot.yml", False, "Missing",
+        suggestion="Run: python3 tool/repo.py init --type <archetype> --target . "
+                   "to generate one, or copy from github.com/quarkloop/guidelines",
+    )
 
 
 def check_pr_template(repo: Path) -> CheckResult:
     """Check PR template has all required sections."""
     content = _read_file(repo / ".github" / "PULL_REQUEST_TEMPLATE.md")
     if content is None:
-        return CheckResult("PR template sections", False, "PULL_REQUEST_TEMPLATE.md not found")
+        return CheckResult(
+            "PR template sections", False, "PULL_REQUEST_TEMPLATE.md not found",
+            suggestion="Run: python3 tool/repo.py sync --repo .",
+        )
 
     missing = [s for s in PR_REQUIRED_SECTIONS if s not in content]
     if missing:
@@ -265,6 +317,7 @@ def check_pr_template(repo: Path) -> CheckResult:
         return CheckResult(
             "PR template sections", False,
             f"Missing {len(missing)} required sections", detail,
+            suggestion="Run: python3 tool/repo.py sync --repo .",
         )
     return CheckResult(
         "PR template sections", True,
@@ -276,7 +329,10 @@ def check_bug_report(repo: Path) -> CheckResult:
     """Check bug_report.yml has required fields."""
     content = _read_file(repo / ".github" / "ISSUE_TEMPLATE" / "bug_report.yml")
     if content is None:
-        return CheckResult("Bug report template fields", False, "bug_report.yml not found")
+        return CheckResult(
+            "Bug report template fields", False, "bug_report.yml not found",
+            suggestion="Run: python3 tool/repo.py sync --repo .",
+        )
 
     missing = [f for f in BUG_REPORT_REQUIRED_FIELDS if f"id: {f}" not in content]
     if missing:
@@ -284,6 +340,7 @@ def check_bug_report(repo: Path) -> CheckResult:
         return CheckResult(
             "Bug report template fields", False,
             f"Missing {len(missing)} required fields", detail,
+            suggestion="Run: python3 tool/repo.py sync --repo .",
         )
     return CheckResult(
         "Bug report template fields", True,
@@ -296,20 +353,28 @@ def check_feature_request(repo: Path) -> CheckResult:
     path = repo / ".github" / "ISSUE_TEMPLATE" / "feature_request.yml"
     if path.exists():
         return CheckResult("Feature request template", True, "Found")
-    return CheckResult("Feature request template", False, "Missing")
+    return CheckResult(
+        "Feature request template", False, "Missing",
+        suggestion="Run: python3 tool/repo.py sync --repo .",
+    )
 
 
 def check_license(repo: Path) -> CheckResult:
     """Check LICENSE file exists and contains a known license."""
     content = _read_file(repo / "LICENSE")
     if content is None:
-        return CheckResult("LICENSE", False, "LICENSE not found")
-
+        return CheckResult(
+            "LICENSE", False, "LICENSE not found",
+            suggestion="Run: python3 tool/repo.py init --type <archetype> --target .",
+        )
     if "Apache License" in content and "Version 2.0" in content:
         return CheckResult("LICENSE", True, "Apache License 2.0")
     if "MIT License" in content:
         return CheckResult("LICENSE", True, "MIT License")
-    return CheckResult("LICENSE", False, "Unknown license (expected Apache 2.0 or MIT)")
+    return CheckResult(
+        "LICENSE", False, "Unknown license (expected Apache 2.0 or MIT)",
+        suggestion="Use Apache 2.0 for platform/agent repos, MIT for SDK repos.",
+    )
 
 
 # ─── All checks registry ───────────────────────────────────────────────
@@ -323,24 +388,18 @@ def run_all_checks(repo: Path) -> List[CheckResult]:
     """
     results: List[CheckResult] = []
 
-    # Required files
     for filepath in REQUIRED_FILES:
         results.append(check_required_file(repo, filepath))
-
-    # Optional files
     for filepath in OPTIONAL_FILES:
         results.append(check_optional_file(repo, filepath))
 
-    # AGENTS.md checks
     results.append(check_agents_sections(repo))
     results.append(check_agents_guidelines_ref(repo))
     results.append(check_agents_line_count(repo))
 
-    # README.md checks
     results.append(check_readme_sections(repo))
     results.append(check_readme_line_count(repo))
 
-    # GitHub config checks
     results.append(check_editorconfig(repo))
     results.append(check_markdownlint_config(repo))
     results.append(check_dependabot(repo))
@@ -348,7 +407,6 @@ def run_all_checks(repo: Path) -> List[CheckResult]:
     results.append(check_bug_report(repo))
     results.append(check_feature_request(repo))
 
-    # License check
     results.append(check_license(repo))
 
     return results

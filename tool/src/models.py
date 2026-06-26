@@ -6,7 +6,7 @@ validators. No logic, no I/O.
 """
 
 from dataclasses import dataclass, field
-from typing import List
+from typing import List, Optional
 
 
 @dataclass
@@ -16,6 +16,7 @@ class CheckResult:
     passed: bool
     message: str = ""
     detail: str = ""
+    suggestion: str = ""  # actionable fix suggestion (for doctor mode)
 
 
 @dataclass
@@ -36,9 +37,12 @@ class ValidationReport:
     def all_passed(self) -> bool:
         return self.failed_count == 0
 
-    def add(self, name: str, passed: bool, message: str = "", detail: str = ""):
+    def add(self, name: str, passed: bool, message: str = "",
+            detail: str = "", suggestion: str = ""):
         """Append a check result."""
-        self.results.append(CheckResult(name, passed, message, detail))
+        self.results.append(
+            CheckResult(name, passed, message, detail, suggestion)
+        )
 
     @property
     def failed_results(self) -> List[CheckResult]:
