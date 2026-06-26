@@ -27,6 +27,39 @@ Consistency across repositories reduces cognitive load for contributors and give
 - [Markdown Linting Specification](./markdownlint/SPEC.md) — markdownlint rules, MDX handling, ignore patterns
   - [.markdownlint.json](./markdownlint/.markdownlint.json) — canonical markdownlint config
 
+## Tooling
+
+### `scripts/init_repo.py` — Scaffold a new repository
+
+Creates the directory structure and copies canonical template files into a new (or existing) repository. Supports 4 archetypes: `library`, `platform`, `docs`, `specs`.
+
+```bash
+# Scaffold a TypeScript library
+python3 scripts/init_repo.py --type library --name "Quark New Lib" --target ./quark-new-lib --language typescript
+
+# Dry run (preview without writing)
+python3 scripts/init_repo.py --type platform --name "Quark New Svc" --target ./quark-new-svc --dry-run
+```
+
+Safe to run on existing repos — it skips files that already exist.
+
+### `scripts/validate_repo.py` — Validate a repository against specs
+
+Checks an existing repository for compliance with the quarkloop guidelines: required files, AGENTS.md sections and line count, README.md sections and line count, GitHub config, issue templates, PR template, license.
+
+```bash
+# Validate a repo (human-readable output)
+python3 scripts/validate_repo.py --repo /path/to/repo
+
+# JSON output (for CI integration)
+python3 scripts/validate_repo.py --repo /path/to/repo --json
+
+# Quiet mode (only show failures)
+python3 scripts/validate_repo.py --repo /path/to/repo --quiet
+```
+
+Exit codes: `0` = all checks passed, `1` = one or more checks failed.
+
 ## How to use
 
 ### When creating a new repo
@@ -83,9 +116,12 @@ guidelines/
 │       ├── pull_request_template.md   ← canonical PR template
 │       ├── dependabot.yml             ← canonical Dependabot config
 │       └── editorconfig               ← canonical EditorConfig
-└── markdownlint/
-    ├── SPEC.md                        ← markdown linting specification
-    └── .markdownlint.json             ← canonical markdownlint config
+├── markdownlint/
+│   ├── SPEC.md                        ← markdown linting specification
+│   └── .markdownlint.json             ← canonical markdownlint config
+└── scripts/
+    ├── init_repo.py                   ← scaffold a new repo from archetype
+    └── validate_repo.py               ← validate a repo against specs
 ```
 
 ## Contributing
