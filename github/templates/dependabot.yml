@@ -1,0 +1,90 @@
+# Dependabot configuration — canonical template.
+#
+# Copy this file to .github/dependabot.yml and uncomment the ecosystems
+# that apply to your repo. Remove the ones that don't.
+#
+# @see https://github.com/quarkloop/guidelines/blob/main/github/SPEC.md
+
+version: 2
+
+updates:
+  # ─── npm (Node.js / TypeScript) ───────────────────────────────────────
+  # Applies to: quark-js, docs, agent (web/)
+  # For agent's web/ directory, set directory to "/web"
+  #
+  # - package-ecosystem: npm
+  #   directory: /
+  #   schedule:
+  #     interval: weekly
+  #     day: monday
+  #   open-pull-requests-limit: 10
+  #   groups:
+  #     minor-and-patch:
+  #       update-types:
+  #         - minor
+  #         - patch
+  #   labels:
+  #     - dependencies
+
+  # ─── Go modules ───────────────────────────────────────────────────────
+  # Applies to: agent, quark
+  #
+  # - package-ecosystem: gomod
+  #   directory: /
+  #   schedule:
+  #     interval: weekly
+  #     day: monday
+  #   open-pull-requests-limit: 10
+  #   groups:
+  #     minor-and-patch:
+  #       update-types:
+  #         - minor
+  #         - patch
+  #   labels:
+  #     - dependencies
+
+  # ─── Maven (Java) ─────────────────────────────────────────────────────
+  # Applies to: quark
+  #
+  # - package-ecosystem: maven
+  #   directory: /
+  #   schedule:
+  #     interval: weekly
+  #     day: monday
+  #   open-pull-requests-limit: 10
+  #   groups:
+  #     minor-and-patch:
+  #       update-types:
+  #         - minor
+  #         - patch
+  #   labels:
+  #     - dependencies
+
+  # ─── Cargo (Rust) ─────────────────────────────────────────────────────
+  # Applies to: agent (services/harness)
+  #
+  # - package-ecosystem: cargo
+  #   directory: /services/harness
+  #   schedule:
+  #     interval: weekly
+  #     day: monday
+  #   open-pull-requests-limit: 10
+  #   groups:
+  #     minor-and-patch:
+  #       update-types:
+  #         - minor
+  #         - patch
+  #   labels:
+  #     - dependencies
+
+  # ─── GitHub Actions ───────────────────────────────────────────────────
+  # Applies to: any repo with .github/workflows/*.yml
+  #
+  # - package-ecosystem: github-actions
+  #   directory: /
+  #   schedule:
+  #     interval: weekly
+  #     day: monday
+  #   open-pull-requests-limit: 10
+  #   labels:
+  #     - dependencies
