@@ -3,7 +3,7 @@
 repo.py — Quarkloop repository management CLI.
 
 This is the single entry point for all repository tooling in the quarkloop
-organization. It provides seven subcommands:
+organization. It provides eight subcommands:
 
   init      Scaffold a new repository with the standard file layout,
             GitHub configuration, and documentation skeletons. Supports
@@ -12,6 +12,11 @@ organization. It provides seven subcommands:
   doctor    Validate an existing repository against the quarkloop
             guidelines and report failures with actionable fix
             suggestions.
+
+  fix       Automatically fix issues found by doctor that can be safely
+            auto-fixed (missing files, broken configs, missing
+            Guidelines reference). Does NOT fix issues requiring human
+            judgment (line counts, section headings).
 
   sync      Copy canonical template files from the guidelines repo into
             an existing repo, overwriting outdated copies.
@@ -49,6 +54,11 @@ USAGE
 
       # Quiet mode (only show failures and fix suggestions):
       python3 tool/repo.py doctor --repo /path/to/repo --quiet
+
+  Auto-fixing issues:
+
+      python3 tool/repo.py fix --repo /path/to/repo
+      python3 tool/repo.py fix --repo /path/to/repo --dry-run
 
   Syncing template files from guidelines:
 
@@ -119,6 +129,7 @@ MODULE LAYOUT
       cmd_check_commits.py `check-commits` subcommand
       cmd_badges.py        `badges` subcommand
       cmd_setup.py         `setup` subcommand
+      cmd_fix.py           `fix` subcommand
 
   Jinja2 templates live in tool/templates/ (*.j2 files).
   Static template files (editorconfig, issue forms) are copied from

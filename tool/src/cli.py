@@ -8,7 +8,7 @@ file under commands/.
 
 import argparse
 
-from .commands import cmd_init, cmd_doctor, cmd_sync, cmd_list, cmd_check_commits, cmd_badges, cmd_setup
+from .commands import cmd_init, cmd_doctor, cmd_sync, cmd_list, cmd_check_commits, cmd_badges, cmd_setup, cmd_fix
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -28,6 +28,7 @@ def build_parser() -> argparse.ArgumentParser:
     cmd_check_commits.add_parser(subparsers)
     cmd_badges.add_parser(subparsers)
     cmd_setup.add_parser(subparsers)
+    cmd_fix.add_parser(subparsers)
 
     return parser
 

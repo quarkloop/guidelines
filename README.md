@@ -50,7 +50,7 @@ This clones all 5 repos (quark, agent, quark-js, docs, guidelines) and installs 
 
 ### `tool/repo.py` — Repository management CLI
 
-A single entry point for all repository tooling. Seven subcommands:
+A single entry point for all repository tooling. Eight subcommands:
 
 ```bash
 # Scaffold a new repository
@@ -58,6 +58,9 @@ python3 tool/repo.py init --type library --name "Quark Lib" --target ./quark-lib
 
 # Validate a repo and get actionable fix suggestions
 python3 tool/repo.py doctor --repo /path/to/repo
+
+# Auto-fix issues found by doctor
+python3 tool/repo.py fix --repo /path/to/repo
 
 # Sync canonical template files from guidelines into a repo
 python3 tool/repo.py sync --repo /path/to/repo
@@ -97,7 +100,8 @@ tool/
 │       ├── cmd_list.py           # `list` — org-wide validation summary
 │       ├── cmd_check_commits.py  # `check-commits` — commit format validation
 │       ├── cmd_badges.py         # `badges` — generate README badges
-│       └── cmd_setup.py          # `setup` — clone repos + install hooks
+│       ├── cmd_setup.py          # `setup` — clone repos + install hooks
+│       └── cmd_fix.py            # `fix` — auto-fix issues from doctor
 └── templates/                    # Jinja2 templates (*.j2)
 ```
 
@@ -189,7 +193,8 @@ guidelines/
     │       ├── cmd_list.py
     │       ├── cmd_check_commits.py
     │       ├── cmd_badges.py
-    │       └── cmd_setup.py
+    │       ├── cmd_setup.py
+    │       └── cmd_fix.py
     └── templates/                    ← Jinja2 templates (*.j2)
 ```
 
