@@ -3,18 +3,31 @@
 set_repo_metadata.py — Set GitHub repo metadata via the API.
 
 Sets description, topics, and homepage URL for all quarkloop repos.
-Requires a GitHub Personal Access Token with 'repo' scope.
+Requires a GitHub Personal Access Token with 'repo' or 'public_repo' scope.
 
 Usage:
-  # Set the token via env var:
-  export GITHUB_TOKEN=ghp_xxxxxxxxxxxx
-  python3 set_repo_metadata.py
 
-  # Or pass it directly:
-  python3 set_repo_metadata.py --token ghp_xxxxxxxxxxxx
+  # Option 1: On-the-fly (no clone needed) — recommended
+  export GITHUB_TOKEN=github_pat_xxxxxxxxxxxx
+  curl -fsSL https://raw.githubusercontent.com/quarkloop/guidelines/main/tool/set_repo_metadata.py | python3 - --token "$GITHUB_TOKEN"
+
+  # Option 2: Run from a local clone of the guidelines repo
+  export GITHUB_TOKEN=github_pat_xxxxxxxxxxxx
+  python3 tool/set_repo_metadata.py
+
+  # Option 3: Pass token directly
+  python3 tool/set_repo_metadata.py --token github_pat_xxxxxxxxxxxx
 
   # Dry run (show what would be set without making API calls):
-  python3 set_repo_metadata.py --token ghp_xxxxxxxxxxxx --dry-run
+  curl -fsSL https://raw.githubusercontent.com/quarkloop/guidelines/main/tool/set_repo_metadata.py | python3 - --dry-run
+
+How to create a PAT:
+  - Fine-grained: https://github.com/settings/personal-access-tokens/new
+    (Resource owner: quarkloop, scope: Administration = Read and write)
+  - Classic: https://github.com/settings/tokens/new
+    (scope: public_repo)
+
+After running, you can delete the token — it's no longer needed.
 """
 
 import argparse
