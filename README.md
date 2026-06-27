@@ -103,6 +103,19 @@ tool/
 2. Open a PR describing what changed and why.
 3. Once merged, each product repo should update its files to match at its own pace — no coordinated migration needed.
 
+## Repositories
+
+The following repositories adhere to these guidelines (26/26 doctor checks passing):
+
+| Repository | Description | Language | License | Repo |
+|---|---|---|---|---|
+| **quark** | Main platform — three-service architecture (Go control plane + Java/GraalJS data plane + Go Catalog) | Java, Go, TypeScript | Apache 2.0 | [github.com/quarkloop/quark](https://github.com/quarkloop/quark) |
+| **agent** | Local operating environment for autonomous AI workspaces (supervisor, runtime, plugins, services) | Go, Rust | Apache 2.0 | [github.com/quarkloop/agent](https://github.com/quarkloop/agent) |
+| **quark-js** | TypeScript SDK for the Quark runtime — execute nodes, pipelines, batch, catalog | TypeScript | MIT | [github.com/quarkloop/quark-js](https://github.com/quarkloop/quark-js) |
+| **docs** | Unified documentation portal — Fuma Docs (Next.js) aggregating markdown from product repos | TypeScript | Apache 2.0 | [github.com/quarkloop/docs](https://github.com/quarkloop/docs) |
+
+This repository (`guidelines`) is a specs repo and does not fully adhere to the product-repo checks — it has no CHANGELOG, CONTRIBUTING, or SECURITY files by design.
+
 ## Line count targets
 
 | File | Small repos | Large repos |
