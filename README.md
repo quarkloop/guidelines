@@ -34,10 +34,8 @@ Consistency across repositories reduces cognitive load for contributors and give
 No need to clone the guidelines repo first — use the standalone bootstrap script:
 
 ```bash
-# Install pre-commit (one-time)
-pip install pre-commit
-
 # Clone all repos + install hooks in one command
+# (the script auto-installs pre-commit via uv or pip if needed)
 curl -fsSL https://raw.githubusercontent.com/quarkloop/guidelines/main/tool/setup_standalone.py | python3 - --all --target ~/quarkloop
 ```
 
@@ -136,12 +134,12 @@ tool/
 
 The following repositories adhere to these guidelines (26/26 doctor checks passing):
 
-| Repository | Description | Language | Repo |
-|---|---|---|---|
-| **quark** | Main platform — three-service architecture (Go control plane + Java/GraalJS data plane + Go Catalog) | Java, Go, TypeScript | [github.com/quarkloop/quark](https://github.com/quarkloop/quark) |
-| **agent** | Local operating environment for autonomous AI workspaces (supervisor, runtime, plugins, services) | Go, Rust | [github.com/quarkloop/agent](https://github.com/quarkloop/agent) |
-| **quark-js** | TypeScript SDK for the Quark runtime — execute nodes, pipelines, batch, catalog | TypeScript | [github.com/quarkloop/quark-js](https://github.com/quarkloop/quark-js) |
-| **docs** | Unified documentation portal — Fuma Docs (Next.js) aggregating markdown from product repos | TypeScript | [github.com/quarkloop/docs](https://github.com/quarkloop/docs) |
+| Repository | Repo |
+|---|---|
+| **quark** | [github.com/quarkloop/quark](https://github.com/quarkloop/quark) |
+| **agent** | [github.com/quarkloop/agent](https://github.com/quarkloop/agent) |
+| **quark-js** | [github.com/quarkloop/quark-js](https://github.com/quarkloop/quark-js) |
+| **docs** | [github.com/quarkloop/docs](https://github.com/quarkloop/docs) |
 
 This repository (`guidelines`) is a specs repo and does not fully adhere to the product-repo checks — it has no CHANGELOG, CONTRIBUTING, or SECURITY files by design.
 

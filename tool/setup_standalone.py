@@ -20,7 +20,9 @@ Usage:
   curl -fsSL https://raw.githubusercontent.com/quarkloop/guidelines/main/tool/setup_standalone.py | python3 - --all --target ~/quarkloop
 
 Prerequisites:
-  pip install pre-commit
+  - git
+  - Either uv or pip (the script auto-installs pre-commit
+    via whichever is available)
 
 The pre-commit config is embedded in this script — no file dependencies.
 After cloning, the guidelines repo's canonical .pre-commit-config.yaml
@@ -97,9 +99,76 @@ repos:
 
 # ─── Helper functions ──────────────────────────────────────────────────
 
-def check_pre_commit() -> bool:
-    """Check if pre-commit is installed."""
-    return shutil.which("pre-commit") is not None
+def ensure_pre_commit() -> bool:
+    """
+    Ensure pre-commit is installed. Tries to find it on PATH first,
+    then installs it via uv or pip. Returns True if available.
+    """
+    # Already installed?
+    if shutil.which("pre-commit"):
+        return True
+
+    print("  pre-commit not found. Attempting to install...")
+
+    # Try uv first (faster, no system pollution)
+    uv = shutil.which("uv")
+    if uv:
+        print("  → Installing via uv...")
+        result = subprocess.run(
+            [uv, "tool", "install", "pre-commit"],
+            capture_output=True, text=True,
+        )
+        if result.returncode == 0:
+            print("  ✓ Installed pre-commit via uv")
+            # uv tool install puts binaries in ~/.local/bin
+            # Check if it's now on PATH
+            if shutil.which("pre-commit"):
+                return True
+            # Try common uv tool bin location
+            home = Path.home()
+            uv_bin = home / ".local" / "bin"
+            if (uv_bin / "pre-commit").exists():
+                os.environ["PATH"] = f"{uv_bin}:{os.environ.get('PATH', '')}"
+                return True
+        else:
+            print(f"  uv install failed: {result.stderr.strip()}")
+
+    # Try pip
+    pip = shutil.which("pip") or shutil.which("pip3")
+    if pip:
+        print(f"  → Installing via {pip}...")
+        result = subprocess.run(
+            [pip, "install", "--user", "pre-commit"],
+            capture_output=True, text=True,
+        )
+        if result.returncode == 0:
+            print("  ✓ Installed pre-commit via pip")
+            # pip --user puts binaries in ~/.local/bin
+            home = Path.home()
+            user_bin = home / ".local" / "bin"
+            if (user_bin / "pre-commit").exists():
+                os.environ["PATH"] = f"{user_bin}:{os.environ.get('PATH', '')}"
+                return True
+            if shutil.which("pre-commit"):
+                return True
+        else:
+            print(f"  pip install failed: {result.stderr.strip()}")
+
+    # Neither worked
+    print()
+    print("Error: Could not install pre-commit.")
+    print()
+    print("  Neither uv nor pip was found on your system, or both failed.")
+    print("  Install one of them first:")
+    print()
+    print("    # Install uv (recommended):")
+    print("    curl -LsSf https://astral.sh/uv/install.sh | sh")
+    print()
+    print("    # Or install pip:")
+    print("    curl -LsSf https://bootstrap.pypa.io/get-pip.py | python3")
+    print()
+    print("  Then re-run this script.")
+    return False
 
 
 def clone_repo(url: str, target: Path) -> bool:
@@ -257,7 +326,9 @@ Examples:
   curl -fsSL https://raw.githubusercontent.com/quarkloop/guidelines/main/tool/setup_standalone.py | python3 - --all --target ~/quarkloop
 
 Prerequisites:
-  pip install pre-commit
+  - git
+  - Either uv or pip (the script auto-installs pre-commit
+    via whichever is available)
         """,
     )
     parser.add_argument(
@@ -279,9 +350,7 @@ Prerequisites:
 
     args = parser.parse_args()
 
-    if not check_pre_commit():
-        print("Error: pre-commit is not installed.")
-        print("  Install it: pip install pre-commit")
+    if not ensure_pre_commit():
         sys.exit(2)
 
     if args.all:
