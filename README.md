@@ -31,7 +31,7 @@ Consistency across repositories reduces cognitive load for contributors and give
 
 ### `tool/repo.py` — Repository management CLI
 
-A single entry point for all repository tooling. Six subcommands:
+A single entry point for all repository tooling. Seven subcommands:
 
 ```bash
 # Scaffold a new repository
@@ -51,6 +51,12 @@ python3 tool/repo.py check-commits --repo /path/to/repo
 
 # Generate README badge markdown
 python3 tool/repo.py badges --repo /path/to/repo
+
+# Clone all repos and install pre-commit hooks
+python3 tool/repo.py setup --all --target ~/quarkloop
+
+# Install hooks in a single existing repo
+python3 tool/repo.py setup --repo /path/to/existing-repo
 ```
 
 Module structure (strict SRP — one responsibility per file):
@@ -70,7 +76,8 @@ tool/
 │       ├── cmd_sync.py           # `sync` — copy templates from guidelines
 │       ├── cmd_list.py           # `list` — org-wide validation summary
 │       ├── cmd_check_commits.py  # `check-commits` — commit format validation
-│       └── cmd_badges.py         # `badges` — generate README badges
+│       ├── cmd_badges.py         # `badges` — generate README badges
+│       └── cmd_setup.py          # `setup` — clone repos + install hooks
 └── templates/                    # Jinja2 templates (*.j2)
 ```
 
@@ -107,12 +114,12 @@ tool/
 
 The following repositories adhere to these guidelines (26/26 doctor checks passing):
 
-| Repository | Description | Language | License | Repo |
-|---|---|---|---|---|
-| **quark** | Main platform — three-service architecture (Go control plane + Java/GraalJS data plane + Go Catalog) | Java, Go, TypeScript | Apache 2.0 | [github.com/quarkloop/quark](https://github.com/quarkloop/quark) |
-| **agent** | Local operating environment for autonomous AI workspaces (supervisor, runtime, plugins, services) | Go, Rust | Apache 2.0 | [github.com/quarkloop/agent](https://github.com/quarkloop/agent) |
-| **quark-js** | TypeScript SDK for the Quark runtime — execute nodes, pipelines, batch, catalog | TypeScript | MIT | [github.com/quarkloop/quark-js](https://github.com/quarkloop/quark-js) |
-| **docs** | Unified documentation portal — Fuma Docs (Next.js) aggregating markdown from product repos | TypeScript | Apache 2.0 | [github.com/quarkloop/docs](https://github.com/quarkloop/docs) |
+| Repository | Description | Language | Repo |
+|---|---|---|---|
+| **quark** | Main platform — three-service architecture (Go control plane + Java/GraalJS data plane + Go Catalog) | Java, Go, TypeScript | [github.com/quarkloop/quark](https://github.com/quarkloop/quark) |
+| **agent** | Local operating environment for autonomous AI workspaces (supervisor, runtime, plugins, services) | Go, Rust | [github.com/quarkloop/agent](https://github.com/quarkloop/agent) |
+| **quark-js** | TypeScript SDK for the Quark runtime — execute nodes, pipelines, batch, catalog | TypeScript | [github.com/quarkloop/quark-js](https://github.com/quarkloop/quark-js) |
+| **docs** | Unified documentation portal — Fuma Docs (Next.js) aggregating markdown from product repos | TypeScript | [github.com/quarkloop/docs](https://github.com/quarkloop/docs) |
 
 This repository (`guidelines`) is a specs repo and does not fully adhere to the product-repo checks — it has no CHANGELOG, CONTRIBUTING, or SECURITY files by design.
 
@@ -160,7 +167,8 @@ guidelines/
     │       ├── cmd_sync.py
     │       ├── cmd_list.py
     │       ├── cmd_check_commits.py
-    │       └── cmd_badges.py
+    │       ├── cmd_badges.py
+    │       └── cmd_setup.py
     └── templates/                    ← Jinja2 templates (*.j2)
 ```
 

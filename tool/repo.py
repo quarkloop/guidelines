@@ -3,7 +3,7 @@
 repo.py — Quarkloop repository management CLI.
 
 This is the single entry point for all repository tooling in the quarkloop
-organization. It provides six subcommands:
+organization. It provides seven subcommands:
 
   init      Scaffold a new repository with the standard file layout,
             GitHub configuration, and documentation skeletons. Supports
@@ -11,28 +11,23 @@ organization. It provides six subcommands:
 
   doctor    Validate an existing repository against the quarkloop
             guidelines and report failures with actionable fix
-            suggestions. Verifies required files, AGENTS.md structure
-            and line count, README.md structure and line count, GitHub
-            config presence, issue/PR template fields, and license type.
+            suggestions.
 
   sync      Copy canonical template files from the guidelines repo into
-            an existing repo, overwriting outdated copies. Only syncs
-            files that are identical across all repos (editorconfig,
-            markdownlint config, issue templates, PR template). Does NOT
-            touch files with repo-specific content.
+            an existing repo, overwriting outdated copies.
 
   list      Discover all git repositories in a workspace directory, run
-            guideline checks on each, and print a summary table showing
-            pass/fail status, AGENTS.md line count, and README line count.
+            guideline checks on each, and print a summary table.
 
   check-commits
             Validate recent commit messages against the Conventional
-            Commits format (type(scope): description). Reports violations
-            with suggestions for correction.
+            Commits format.
 
   badges    Generate consistent README badge markdown for a repository.
-            Auto-detects license, language, and CI status from repo
-            contents.
+
+  setup     Clone quarkloop repositories and install pre-commit hooks.
+            Can set up a single repo (--repo) or all repos at once
+            (--all).
 
 USAGE
 
@@ -77,6 +72,11 @@ USAGE
       python3 tool/repo.py badges --repo /path/to/repo
       python3 tool/repo.py badges --repo /path/to/repo --no-ci
 
+  Cloning repos and installing pre-commit hooks:
+
+      python3 tool/repo.py setup --all --target ~/quarkloop
+      python3 tool/repo.py setup --repo /path/to/existing-repo
+
   Help:
 
       python3 tool/repo.py --help
@@ -118,6 +118,7 @@ MODULE LAYOUT
       cmd_list.py          `list` subcommand
       cmd_check_commits.py `check-commits` subcommand
       cmd_badges.py        `badges` subcommand
+      cmd_setup.py         `setup` subcommand
 
   Jinja2 templates live in tool/templates/ (*.j2 files).
   Static template files (editorconfig, issue forms) are copied from
