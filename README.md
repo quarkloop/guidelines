@@ -29,6 +29,27 @@ Consistency across repositories reduces cognitive load for contributors and give
 
 ## Tooling
 
+### Quick start for new developers
+
+No need to clone the guidelines repo first — use the standalone bootstrap script:
+
+```bash
+# Install pre-commit (one-time)
+pip install pre-commit
+
+# Clone all repos + install hooks in one command
+curl -fsSL https://raw.githubusercontent.com/quarkloop/guidelines/main/tool/setup_standalone.py | python3 - --all --target ~/quarkloop
+```
+
+Or download and run locally:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/quarkloop/guidelines/main/tool/setup_standalone.py -o setup.py
+python3 setup.py --all --target ~/quarkloop
+```
+
+This clones all 5 repos (quark, agent, quark-js, docs, guidelines) and installs pre-commit hooks in each. After that, the full `tool/repo.py` CLI is available at `~/quarkloop/guidelines/tool/repo.py`.
+
 ### `tool/repo.py` — Repository management CLI
 
 A single entry point for all repository tooling. Seven subcommands:
@@ -64,6 +85,7 @@ Module structure (strict SRP — one responsibility per file):
 ```
 tool/
 ├── repo.py                       # Single entry point — imports cli.main()
+├── setup_standalone.py           # Bootstrap script (no guidelines clone needed)
 ├── src/
 │   ├── cli.py                    # Argument parsing and subcommand dispatch
 │   ├── generator.py              # Jinja2 template rendering (init)
@@ -155,6 +177,7 @@ guidelines/
 │   └── .markdownlint.json             ← canonical markdownlint config
 └── tool/
     ├── repo.py                       ← single CLI entry point
+    ├── setup_standalone.py           ← bootstrap script (no guidelines clone needed)
     ├── src/
     │   ├── cli.py                    ← argument parsing and dispatch
     │   ├── generator.py              ← Jinja2 template rendering (init)
